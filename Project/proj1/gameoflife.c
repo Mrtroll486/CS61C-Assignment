@@ -5,7 +5,7 @@
 ** DESCRIPTION: CS61C Fall 2020 Project 1
 **
 ** AUTHOR:      Justin Yokota - Starter Code
-**				YOUR NAME HERE
+**              Mr_troll863
 **
 **
 ** DATE:        2020-08-23
@@ -22,13 +22,63 @@
 int offset_row[] = {-1,  1,  0,  0, -1, -1,  1,  1};
 int offset_col[] = { 0,  0, -1,  1, -1,  1, -1,  1};
 
+// Determines the color channel by the iteration count
+uint8_t colorSelector(Color pixel, int iter) {
+	int color = iter / 8;
+	uint8_t color_val;
+	switch (color) {
+		case 0: {
+			color_val = pixel.R;
+			break;
+		}
+		case 1: {
+			color_val = pixel.G;
+			break;
+		}
+		case 2: {
+			color_val = pixel.B;
+			break;
+		}
+	}
+	return color_val;
+}
+
 //Determines what color the cell at the given row/col should be. This function allocates space for a new Color.
 //Note that you will need to read the eight neighbors of the cell in question. The grid "wraps", so we treat the top row as adjacent to the bottom row
 //and the left column as adjacent to the right column.
 Color *evaluateOneCell(Image *image, int row, int col, uint32_t rule)
 {
 	//YOUR CODE HERE
-	// todo: implement a 24-channel evaluater
+	Color *new_pixel = (Color*)malloc(sizeof(Color));
+	uint32_t img_row = image->rows, img_col = image->cols;
+
+	uint8_t new_channel_val = 0;
+	for (int i = 0; i < 24; i++) {
+		// there are 24 channels, 3 colors, so each color uses 8 channels
+		int bit = i % 8;
+		uint8_t target_bit = colorSelector(image->image[row][col], i) >> bit & 1;
+		uint32_t target_rule = rule >> (target_bit ? 9 : 0);
+		int adj_live_count = 0;
+		for (int j = 0; j < 8; j++) {
+			uint8_t adj_bit = colorSelector(image->image[(row + img_row + offset_row[j]) % img_row][(col + img_col + offset_col[j]) % img_col], i) >> bit & 1;
+			if (adj_bit) {
+				adj_live_count++;
+			}
+		}
+		new_channel_val = (new_channel_val << 1) | (target_rule >> adj_live_count & 1);
+		if (i == 7) {
+			new_pixel->R = new_channel_val;
+			new_channel_val = 0;
+		} else if (i == 15) {
+			new_pixel->G = new_channel_val;
+			new_channel_val = 0;
+		} else if (i ==23) {
+			new_pixel->B = new_channel_val;
+			new_channel_val = 0;
+		}
+	}
+
+	return new_pixel;
 }
 
 //The main body of Life; given an image and a rule, computes one iteration of the Game of Life.
@@ -79,7 +129,7 @@ int main(int argc, char **argv)
 	if (argc != 3) {
 		printf("	usage: ./gameOfLife filename rule\n");
 		printf("	filename is an ASCII PPM file (type P3) with maximum value 255\n");
-		printf("	rule is a hex number beginning with 0x; Life is 0x1808");
+		printf("	rule is a hex number beginning with 0x; Life is 0x1808\n");
 		return -1;
 	}
 
