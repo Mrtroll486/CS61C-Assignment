@@ -40,6 +40,9 @@ test_bit_ops.c: bit_ops.h
 .c.o:
 	$(CC) -c $(CFLAGS) $<
 
+vector-test: $(VECTOR_OBJS)
+	$(CC) $(CFLAGS) -g -o $(VECTOR_PROG) $(VECTOR_OBJS) $(LDFLAGS)
+
 vector-memcheck: $(VECTOR_PROG)
 	$(MEMCHECK) ./$(VECTOR_PROG)
 
