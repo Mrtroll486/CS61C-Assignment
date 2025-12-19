@@ -3,6 +3,8 @@
 n: .word 9
 
 .text
+# hi!
+# hi from vscode!
 main:
     add t0, x0, x0
     addi t1, x0, 1

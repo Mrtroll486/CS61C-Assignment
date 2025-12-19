@@ -21,4 +21,22 @@ main:
     ecall # Exit
 
 factorial:
-    # YOUR CODE HERE
+    # a0 stores the value n
+    addi t0, zero, 1 # t0 stores the final answer
+    addi t1, zero, 1 # t1 stores the index
+
+    outer_loop:
+        bge t1, a0, outer_end
+        addi t1, t1, 1
+        addi t2, zero, 1 # set t2 to 1
+        addi t3, t0, 0 # record the initial value of t0
+        inner_loop:
+            bge t2, t1, inner_end
+            addi t2, t2, 1
+            add t0, t0, t3
+            j inner_loop
+        inner_end:
+        j outer_loop
+    outer_end:
+    addi a0, t0, 0 # prepare the return value
+    jr ra # return
