@@ -50,7 +50,7 @@ def _process_coverage(coverage: str, file_filter: str):
         if len(line.strip()) == 0: continue
         p = line.strip().split(' ')
         assert len(p) == 3, f"Unexpected coverage line {line}. Do you have a space in the filename or path?"
-        import_path, line = p[1].split(':')
+        import_path, line = p[1].split(':', 1)
         filename = os.path.basename(import_path)
         if filename != file_filter: continue
         _global_coverage[filename][int(line)] += int(p[2])
