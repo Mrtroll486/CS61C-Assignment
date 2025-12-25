@@ -55,8 +55,8 @@ normal_procedure:
     sw ra, 0(sp) # store the return address
 
     mv t0, zero # use t0 as sum
-    mv t1, zero # use t1 as i index
-    mv t2, zero # use t2 as j index
+    mv t1, zero # use t1 as i index, row
+    mv t2, zero # use t2 as j index, col
     # i bound is a1, j bound is a5
 
 outer_loop_start:
@@ -66,9 +66,11 @@ outer_loop_start:
 inner_loop_start:
     bge t2, a5, inner_loop_end
 
+    # for m0, we need get the address of the i-th row, 1st element
     # calc m0's row vec base addr
     mv t3, t1
     slli t3, t3, 2
+    mul t3, t3, a2 # offset amount is one or more WHOLE row
     add t3, t3, a0 # m0 row vec base in t3
 
     # calc m1's col vec base addr
@@ -76,19 +78,41 @@ inner_loop_start:
     slli t4, t4, 2
     add t4, t4, a3 # m1 col vec base in t4
 
-    # prepare arg for dot
+    # store a0-a4 in stack
     sw a0, 4(sp)
     sw a1, 8(sp)
     sw a2, 12(sp)
     sw a3, 16(sp)
     sw a4, 20(sp)
+    
+    # prepare arg for dot
     mv a0, t3
     mv a1, t4
     # a2 stays same
-    addi a3, zero, 1
+    li a3, 1
     mv a4, a5
     # call dot
     jr dot
+
+    # store the result in t0
+    mv t0, a0
+    # restore a0-a4
+    lw a0, 4(sp)
+    lw a1, 8(sp)
+    lw a2, 12(sp)
+    lw a3, 16(sp)
+    lw a4, 20(sp)
+
+    # todo: compute the store address in d
+    # note that d is a (a1) * (a5) 2d matrix
+    slli t3, t1, 2
+    mul t3, t3, a5
+
+    slli t4, t2, 2
+    add t3, t3, t4 # get offset in array
+    add t3, t3, a6 # get offset in memory layout
+    
+    sw t0, 0(t3) # store
 
     addi t2, t2, 1
     j inner_loop_start
@@ -104,5 +128,5 @@ outer_loop_end:
     # Epilogue
     lw ra, 0(sp)
     # todo: remember to restore sp
-    
+    addi sp, sp, 24
     ret
