@@ -31,7 +31,7 @@ matmul:
     bge a2, t0, check_m1_shape
 
 nonsense_m0_shape:
-    addi a0, zero, 72
+    addi a1, zero, 72
     j exit2
 
 check_m1_shape:
@@ -39,14 +39,14 @@ check_m1_shape:
     bge a5, t0, check_shape_align
 
 nonsense_m1_shape:
-    addi a0, zero, 73
+    addi a1, zero, 73
     j exit2
 
 check_shape_align:
     beq a2, a4, normal_procedure
 
     # m0's col dose not match with m1's row, matmul cannot be applied
-    addi a0, zero, 74
+    addi a1, zero, 74
     j exit2
 
 normal_procedure:
@@ -127,10 +127,8 @@ inner_loop_start:
 inner_loop_end:
     addi t1, t1, 1
 
-
     j outer_loop_start
 outer_loop_end:
-
 
     # Epilogue
     lw ra, 0(sp)

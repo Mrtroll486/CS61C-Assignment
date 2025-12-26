@@ -265,6 +265,60 @@ class TestMatmul(TestCase):
             [30, 36, 42, 66, 81, 96, 102, 126, 150]
         )
 
+    def test_non_square_matrics_1(self):
+        self.do_matmul(
+            [1, 2, 3, 4, 5, 6], 2, 3,
+            [1, 2, 3, 4, 5, 6], 3, 2,
+            [22, 28, 49, 64]
+        )
+
+    def test_non_square_matrics_2(self):
+        self.do_matmul(
+            [1, 2, 3, 4, 5, 6], 3, 2,
+            [1, 2, 3, 4, 5, 6], 2, 3,
+            [9, 12, 15, 19, 26, 33, 29, 40, 51]
+        )
+
+    def test_m0_bad_shape_1(self):
+        self.do_matmul(
+            [1, 2, 3, 4, 5, 6, 7, 8, 9], -3, 3,
+            [1, 2, 3, 4, 5, 6, 7, 8, 9], 3, 3,
+            [30, 36, 42, 66, 81, 96, 102, 126, 150],
+            code=72
+        )
+
+    def test_m0_bad_shape_2(self):
+        self.do_matmul(
+            [1, 2, 3, 4, 5, 6, 7, 8, 9], 3, -3,
+            [1, 2, 3, 4, 5, 6, 7, 8, 9], 3, 3,
+            [30, 36, 42, 66, 81, 96, 102, 126, 150],
+            code=72
+        )
+
+    def test_m1_bad_shape_1(self):
+        self.do_matmul(
+            [1, 2, 3, 4, 5, 6, 7, 8, 9], 3, 3,
+            [1, 2, 3, 4, 5, 6, 7, 8, 9], -3, 3,
+            [30, 36, 42, 66, 81, 96, 102, 126, 150],
+            code=73
+        )
+
+    def test_m1_bad_shape_2(self):
+        self.do_matmul(
+            [1, 2, 3, 4, 5, 6, 7, 8, 9], 3, 3,
+            [1, 2, 3, 4, 5, 6, 7, 8, 9], 3, -3,
+            [30, 36, 42, 66, 81, 96, 102, 126, 150],
+            code=73
+        )
+
+    def test_m0_m1_mismatch(self):
+        self.do_matmul(
+            [1, 2, 3, 4, 5, 6, 7, 8, 9], 3, 5,
+            [1, 2, 3, 4, 5, 6, 7, 8, 9], 3, 3,
+            [30, 36, 42, 66, 81, 96, 102, 126, 150],
+            code=74
+        )
+
     @classmethod
     def tearDownClass(cls):
         print_coverage("matmul.s", verbose=False)
