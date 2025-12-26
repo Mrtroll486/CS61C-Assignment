@@ -32,7 +32,7 @@ matmul:
 
 nonsense_m0_shape:
     addi a0, zero, 72
-    jr exit2
+    j exit2
 
 check_m1_shape:
     blt a4, t0, nonsense_m1_shape
@@ -40,18 +40,18 @@ check_m1_shape:
 
 nonsense_m1_shape:
     addi a0, zero, 73
-    jr exit2
+    j exit2
 
 check_shape_align:
     beq a2, a4, normal_procedure
 
     # m0's col dose not match with m1's row, matmul cannot be applied
     addi a0, zero, 74
-    jr exit2
+    j exit2
 
 normal_procedure:
     # Prologue
-    addi sp, sp, -24
+    addi sp, sp, -40
     sw ra, 0(sp) # store the return address
 
     mv t0, zero # use t0 as sum
@@ -84,6 +84,10 @@ inner_loop_start:
     sw a2, 12(sp)
     sw a3, 16(sp)
     sw a4, 20(sp)
+    sw a5, 24(sp)
+    sw a6, 28(sp)
+    sw t1, 32(sp)
+    sw t2, 36(sp)
     
     # prepare arg for dot
     mv a0, t3
@@ -92,18 +96,21 @@ inner_loop_start:
     li a3, 1
     mv a4, a5
     # call dot
-    jr dot
+    jal dot
 
     # store the result in t0
     mv t0, a0
-    # restore a0-a4
+    # restore a0-a6, t1 and t2, remember the calling convention
     lw a0, 4(sp)
     lw a1, 8(sp)
     lw a2, 12(sp)
     lw a3, 16(sp)
     lw a4, 20(sp)
+    lw a5, 24(sp)
+    lw a6, 28(sp)
+    lw t1, 32(sp)
+    lw t2, 36(sp)
 
-    # todo: compute the store address in d
     # note that d is a (a1) * (a5) 2d matrix
     slli t3, t1, 2
     mul t3, t3, a5
@@ -127,6 +134,5 @@ outer_loop_end:
 
     # Epilogue
     lw ra, 0(sp)
-    # todo: remember to restore sp
-    addi sp, sp, 24
+    addi sp, sp, 40
     ret
