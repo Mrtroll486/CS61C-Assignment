@@ -78,7 +78,7 @@ inner_loop_start:
     slli t4, t4, 2
     add t4, t4, a3 # m1 col vec base in t4
 
-    # store a0-a4 in stack
+    # store a0-a6, t1 and t2 in stack
     sw a0, 4(sp)
     sw a1, 8(sp)
     sw a2, 12(sp)
