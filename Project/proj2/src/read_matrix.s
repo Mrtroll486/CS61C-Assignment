@@ -28,12 +28,28 @@ read_matrix:
     # Prologue
     addi sp, sp, -32
     sw ra, 0(sp)
+    sw s0, 4(sp)
+    sw s1, 8(sp)
+    sw s2, 12(sp)
+    sw s3, 16(sp)
+    sw s4, 20(sp)
+    sw s5, 24(sp)
+    sw s6, 28(sp)
+
+    mv s0, a0
+    mv s1, a1
+    mv s2, a2
+    # vars:
+    # s0: file path
+    # s1: pointer to row number
+    # s2: pointer to col number
+    # s3: file descriptor
+    # s4: the total num of elements
+    # s5: loop index
+    # s6: pointer of the result array
 
     # Get the file descriptor
-	sw a0, 4(sp)
-    sw a1, 8(sp)
-    sw a2, 12(sp)
-
+    mv a1, a0
     li a2, 0
 
     jal fopen
@@ -44,19 +60,11 @@ read_matrix:
     jal exit2
 
 fopen_success:
-    mv t0, a0 # t0 contains the file descriptor
-	lw a0, 4(sp)
-    lw a1, 8(sp)
-    lw a2, 12(sp)
+    mv s3, a0 # s3 contains the file descriptor
 
-    # read row and col
-	sw a0, 4(sp)
-    sw a1, 8(sp)
-    sw a2, 12(sp)
-    sw t0, 16(sp)
-    
-    mv a1, t0 # file descriptor
-    lw a2, 8(sp) # row
+    # read row and col, prepare arguments
+    mv a1, s3 # file descriptor
+    mv a2, s1 # row
     li a3, 4
     
     jal fread
@@ -64,65 +72,68 @@ fopen_success:
     li a3, 4
     bne a3, a0, fread_error
 
-    mv a1, t0
-    lw a2, 12(sp) # col
+    mv a1, s3
+    mv a2, s2 # col
     li a3, 4
 
     jal fread
     
     li a3, 4
     bne a3, a0, fread_error
-    
-	lw a0, 4(sp)
-    lw a1, 8(sp)
-    lw a2, 12(sp)
-    lw t0, 16(sp)
 
-    lw t1, 0(a1) # get the row number
-    lw t2, 0(a2) # get the col number
+    lw t1, 0(s1) # get the row number
+    lw t2, 0(s2) # get the col number
 
-    mul t1, t1, t2 # total elements
-    slli t2, t1, 2 # total size
+    mul s4, t1, t2 # total elements
+    slli t2, s4, 2 # total size
 
-    sw a0, 4(sp)
-    sw a1, 8(sp)
-    sw a2, 12(sp)
-    sw t0, 16(sp)
-    sw t1, 20(sp)
-    sw t2, 24(sp)
-
+    # prepare arguments for malloc
     mv a0, t2 # the size parameter
 
     jal malloc
 
-    mv t3, a0 # t3 stores the pointer of the result array
+	li t0, 1
+    blt a0, t0, malloc_error # check the result of malloc
+    mv s6, a0 # s6 stores the pointer of the result array
 
-    lw a0, 4(sp)
-    lw a1, 8(sp)
-    lw a2, 12(sp)
-    lw t0, 16(sp)
-    lw t1, 20(sp)
-    lw t2, 24(sp)
-
-    # local vars:
-    # t0: file descriptor
-    # t1: the total num of elements
-    # t2: loop index
-    # t3: pointer of the result array
-
-    li t2, 0
-
+    li s5, 0 # set loop index to 0
 loop_start:
-    bge t2, t1, loop_end
+    bge s5, s4, loop_end
 
+    slli t0, s5, 2 # calc the offset in dest array
+    add t0, t0, s6
 
+    #prepare arguments for fread
+    mv a1, s3
+    mv a2, t0
+    li a3, 4
 
-    addi t2, t2, 1
+    jal fread
+
+    li a3, 4
+    bne a3, a0, fread_error
+
+    addi s5, s5, 1
     j loop_start
 loop_end:
+	# prepare return value for fclose
+    mv a1, s3
 
+    jal fclose
+
+    bne a0, zero, fclose_error
+
+    mv a0, s6 # prepare return value
+    
     # Epilogue
     lw ra, 0(sp)
+    lw s0, 4(sp)
+    lw s1, 8(sp)
+    lw s2, 12(sp)
+    lw s3, 16(sp)
+    lw s4, 20(sp)
+    lw s5, 24(sp)
+    lw s6, 28(sp)
     addi sp, sp, 32
 
     ret
@@ -133,4 +144,8 @@ fread_error:
 
 fclose_error:
     li a1, 92
+    jal exit2
+
+malloc_error:
+    li a1, 88
     jal exit2

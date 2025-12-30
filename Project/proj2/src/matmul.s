@@ -51,86 +51,91 @@ check_shape_align:
 
 normal_procedure:
     # Prologue
-    addi sp, sp, -40
+    addi sp, sp, -48
     sw ra, 0(sp) # store the return address
+    sw s0, 4(sp)
+    sw s1, 8(sp)
+    sw s2, 12(sp)
+    sw s3, 16(sp)
+    sw s4, 20(sp)
+    sw s5, 24(sp)
+    sw s6, 28(sp)
+    sw s7, 32(sp)
+    sw s8, 36(sp)
+
+    mv s0, a0
+    mv s1, a1
+    mv s2, a2
+    mv s3, a3
+    mv s4, a4
+    mv s5, a5
+    mv s6, a6
 
     mv t0, zero # use t0 as sum
-    mv t1, zero # use t1 as i index, row
-    mv t2, zero # use t2 as j index, col
+    mv s7, zero # use s7 as i index, row
+    mv s8, zero # use s8 as j index, col
     # i bound is a1, j bound is a5
 
 outer_loop_start:
-	mv t2, zero
-    bge t1, a1, outer_loop_end
+	mv s8, zero
+    bge s7, s1, outer_loop_end
 
 inner_loop_start:
-    bge t2, a5, inner_loop_end
+    bge s8, s5, inner_loop_end
 
     # for m0, we need get the address of the i-th row, 1st element
     # calc m0's row vec base addr
-    mv t3, t1
+    mv t3, s7
     slli t3, t3, 2
-    mul t3, t3, a2 # offset amount is one or more WHOLE row
-    add t3, t3, a0 # m0 row vec base in t3
+    mul t3, t3, s2 # offset amount is one or more WHOLE row
+    add t3, t3, s0 # m0 row vec base in t3
 
     # calc m1's col vec base addr
-    mv t4, t2
+    mv t4, s8
     slli t4, t4, 2
-    add t4, t4, a3 # m1 col vec base in t4
+    add t4, t4, s3 # m1 col vec base in t4
 
-    # store a0-a6, t1 and t2 in stack
-    sw a0, 4(sp)
-    sw a1, 8(sp)
-    sw a2, 12(sp)
-    sw a3, 16(sp)
-    sw a4, 20(sp)
-    sw a5, 24(sp)
-    sw a6, 28(sp)
-    sw t1, 32(sp)
-    sw t2, 36(sp)
-    
     # prepare arg for dot
     mv a0, t3
     mv a1, t4
-    # a2 stays same
+    mv a2, s2
     li a3, 1
-    mv a4, a5
+    mv a4, s5
     # call dot
     jal dot
 
     # store the result in t0
     mv t0, a0
-    # restore a0-a6, t1 and t2, remember the calling convention
-    lw a0, 4(sp)
-    lw a1, 8(sp)
-    lw a2, 12(sp)
-    lw a3, 16(sp)
-    lw a4, 20(sp)
-    lw a5, 24(sp)
-    lw a6, 28(sp)
-    lw t1, 32(sp)
-    lw t2, 36(sp)
 
     # note that d is a (a1) * (a5) 2d matrix
-    slli t3, t1, 2
-    mul t3, t3, a5
+    slli t3, s7, 2
+    mul t3, t3, s5
 
-    slli t4, t2, 2
+    slli t4, s8, 2
     add t3, t3, t4 # get offset in array
-    add t3, t3, a6 # get offset in memory layout
+    add t3, t3, s6 # get offset in memory layout
     
     sw t0, 0(t3) # store
 
-    addi t2, t2, 1
+    addi s8, s8, 1
     j inner_loop_start
 
 inner_loop_end:
-    addi t1, t1, 1
+    addi s7, s7, 1
 
     j outer_loop_start
 outer_loop_end:
 
     # Epilogue
     lw ra, 0(sp)
-    addi sp, sp, 40
+    lw s0, 4(sp)
+    lw s1, 8(sp)
+    lw s2, 12(sp)
+    lw s3, 16(sp)
+    lw s4, 20(sp)
+    lw s5, 24(sp)
+    lw s6, 28(sp)
+    lw s7, 32(sp)
+    lw s8, 36(sp)
+    addi sp, sp, 48
     ret
