@@ -39,7 +39,7 @@ read_matrix:
     mv s0, a0
     mv s1, a1
     mv s2, a2
-    # vars:
+    # Variables:
     # s0: file path
     # s1: pointer to row number
     # s2: pointer to col number
