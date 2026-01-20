@@ -44,7 +44,6 @@ write_matrix:
     mv s2, a2
     mv s3, a3
     li s4, 0
-    li s5, 0
 
     # try to open file
     mv a1, s0
@@ -79,7 +78,7 @@ write_matrix:
     mv a1, s0
     mv a2, s1
     mv a3, s4
-    mv a4, 4
+    li a4, 4
 
     jal fwrite
 
@@ -101,7 +100,7 @@ write_matrix:
     lw s2, 12(sp)
     lw s3, 16(sp)
     lw s4, 20(sp)
-
+    addi sp, sp, 32
     ret
 
 fopen_error:
