@@ -32,11 +32,11 @@ loop_start:
 
     bge t2, zero, loop_continue # if element >= 0, jump
     # element < 0
-    addi t2, zero, 0
+    li t2, 0
     # here we loop through
+    sw t2, 0(t1)
 loop_continue:
 
-    sw t2, 0(t1)
     addi t0, t0, 1
     j loop_start
 
