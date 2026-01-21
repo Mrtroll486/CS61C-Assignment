@@ -45,7 +45,7 @@ read_matrix:
     # s2: pointer to col number
     # s3: file descriptor
     # s4: the total num of elements
-    # s5: loop index
+    # s5: total size of element
     # s6: pointer of the result array
 
     # Get the file descriptor
@@ -85,10 +85,10 @@ fopen_success:
     lw t2, 0(s2) # get the col number
 
     mul s4, t1, t2 # total elements
-    slli t2, s4, 2 # total size
+    slli s5, s4, 2 # total size
 
     # prepare arguments for malloc
-    mv a0, t2 # the size parameter
+    mv a0, s5 # the size parameter
 
     jal malloc
 
@@ -96,26 +96,15 @@ fopen_success:
     blt a0, t0, malloc_error # check the result of malloc
     mv s6, a0 # s6 stores the pointer of the result array
 
-    li s5, 0 # set loop index to 0
-loop_start:
-    bge s5, s4, loop_end
-
-    slli t0, s5, 2 # calc the offset in dest array
-    add t0, t0, s6
-
-    #prepare arguments for fread
+    # prepare the argument for fread
     mv a1, s3
-    mv a2, t0
-    li a3, 4
+    mv a2, s6    
+    mv a3, s5
 
     jal fread
 
-    li a3, 4
-    bne a3, a0, fread_error
+    bne a0, s5, fread_error
 
-    addi s5, s5, 1
-    j loop_start
-loop_end:
 	# prepare return value for fclose
     mv a1, s3
 
