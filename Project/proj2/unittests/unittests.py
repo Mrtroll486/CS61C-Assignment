@@ -466,13 +466,58 @@ class TestClassify(TestCase):
         args = ["inputs/simple0/bin/m0.bin", "inputs/simple0/bin/m1.bin",
                 "inputs/simple0/bin/inputs/input0.bin", out_file]
         # call classify function
+        t.input_scalar("a2", 0)
         t.call("classify")
         # generate assembly and pass program arguments directly to venus
         t.execute(args=args)
+        # compare the output file and the refrence output
+        t.check_file_output(out_file, ref_file)
+        # compare the classification output with `check_stdout`
+        t.check_stdout("2")
 
-        # compare the output file and
-        raise NotImplementedError("TODO")
-        # TODO
+    def test_simple0_input0_without_print(self):
+        t = self.make_test()
+        out_file = "outputs/test_basic_main/student0.bin"
+        ref_file = "outputs/test_basic_main/reference0.bin"
+        args = ["inputs/simple0/bin/m0.bin", "inputs/simple0/bin/m1.bin",
+                "inputs/simple0/bin/inputs/input0.bin", out_file]
+        # call classify function
+        t.input_scalar("a2", 1)
+        t.call("classify")
+        # generate assembly and pass program arguments directly to venus
+        t.execute(args=args)
+        # compare the output file and the refrence output
+        t.check_file_output(out_file, ref_file)
+        # compare the classification output with `check_stdout`
+
+    def test_wrong_arg_num(self):
+        t = self.make_test()
+        out_file = "outputs/test_basic_main/student0.bin"
+        ref_file = "outputs/test_basic_main/reference0.bin"
+        args = ["inputs/simple0/bin/m1.bin",
+                "inputs/simple0/bin/inputs/input0.bin", out_file]
+        # call classify function
+        t.input_scalar("a2", 1)
+        t.call("classify")
+        # generate assembly and pass program arguments directly to venus
+        t.execute(args=args, code=89)
+        # compare the output file and the refrence output
+        t.check_file_output(out_file, ref_file)
+        # compare the classification output with `check_stdout`
+
+    def test_malloc_fail(self):
+        t = self.make_test()
+        out_file = "outputs/test_basic_main/student0.bin"
+        ref_file = "outputs/test_basic_main/reference0.bin"
+        args = ["inputs/simple0/bin/m0.bin", "inputs/simple0/bin/m1.bin",
+                "inputs/simple0/bin/inputs/input0.bin", out_file]
+        # call classify function
+        t.input_scalar("a2", 1)
+        t.call("classify")
+        # generate assembly and pass program arguments directly to venus
+        t.execute(args=args, code=88, fail='malloc')
+        # compare the output file and the refrence output
+        t.check_file_output(out_file, ref_file)
         # compare the classification output with `check_stdout`
 
     @classmethod
