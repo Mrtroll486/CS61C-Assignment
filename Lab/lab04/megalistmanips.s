@@ -46,7 +46,7 @@ main:
     ecall
 
 map:
-    addi sp, sp, -12
+    addi sp, sp, -24
     sw ra, 0(sp)
     sw s1, 4(sp)
     sw s0, 8(sp)
@@ -66,27 +66,44 @@ map:
     # are modified by the callees, even when we know the content inside the functions 
     # we call. this is to enforce the abstraction barrier of calling convention.
 mapLoop:
-    add t1, s0, x0      # load the address of the array of current node into t1
+    # Mistake 1: load the address of the pointer towards arr, not the address of the arr
+    lw t1, 0(s0)      # load the address of the array of current node into t1
+    # Correction done
     lw t2, 4(s0)        # load the size of the node's array into t2
 
-    add t1, t1, t0      # offset the array address by the count
+    # Mistake 2: offset was not applied to t0
+    slli t3, t0, 2
+    add t1, t1, t3      # offset the array address by the count 
+    # Correction done
     lw a0, 0(t1)        # load the value at that address into a0
-
+    
+    # Mistake 3: didn't save temp reg before calling function
+    sw t0, 12(sp)
+    sw t1, 16(sp)
+    sw t2, 20(sp)
     jalr s1             # call the function on that value.
+    lw t0, 12(sp)
+    lw t1, 16(sp)
+    lw t2, 20(sp)
+    # Correction done
 
     sw a0, 0(t1)        # store the returned value back into the array
     addi t0, t0, 1      # increment the count
     bne t0, t2, mapLoop # repeat if we haven't reached the array size yet
 
-    la a0, 8(s0)        # load the address of the next node into a0
-    lw a1, 0(s1)        # put the address of the function back into a1 to prepare for the recursion
+    # Mistake 4: load the address to the pointer pointing next node, not the address of the funtcion
+    lw a0, 8(s0)        # load the address of the next node into a0
+    # Correction done
+    # Mistake 5: load the the content of the function, not the pointer to the function
+    mv a1, s1        # put the address of the function back into a1 to prepare for the recursion
+    # Correction done
 
     jal  map            # recurse
 done:
     lw s0, 8(sp)
     lw s1, 4(sp)
     lw ra, 0(sp)
-    addi sp, sp, 12
+    addi sp, sp, 24
     jr ra
 
 mystery:
