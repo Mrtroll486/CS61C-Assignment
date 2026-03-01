@@ -17,7 +17,7 @@
 | **lw** rd, offset(rs1)    | I        | 0x03       | 0x2        |                  | R[rd] ← Mem(R[rs1] + offset, word)                      |
 | **addi** rd, rs1, imm     | I        | 0x13       | 0x0        |                  | R[rd] ← R[rs1] + imm                                    |
 | **slli** rd, rs1, imm     | I        | 0x13       | 0x1        | 0x00             | R[rd] ← R[rs1] << imm                                   |
-| ***slti** rd, rs1, imm*   | I        | 0x13       | 0x2        |                  | R[rd] ← (R[rs1] < imm) ? 1 : 0                          |
+| **slti** rd, rs1, imm     | I        | 0x13       | 0x2        |                  | R[rd] ← (R[rs1] < imm) ? 1 : 0                          |
 | **xori** rd, rs1, imm     | I        | 0x13       | 0x4        |                  | R[rd] ← R[rs1] ^ imm                                    |
 | **srli** rd, rs1, imm     | I        | 0x13       | 0x5        | 0x00             | R[rd] ← R[rs1] >> imm                                   |
 | **srai** rd, rs1, imm     | I        | 0x13       | 0x5        | 0x20             | R[rd] ← R[rs1] >> imm                                   |

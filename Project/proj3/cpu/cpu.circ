@@ -514,11 +514,11 @@ end TCL_Generic;
       <a name="label" val="ALUSel"/>
       <a name="width" val="4"/>
     </comp>
-    <comp lib="0" loc="(2040,770)" name="Tunnel">
-      <a name="label" val="BrLt"/>
-    </comp>
-    <comp lib="0" loc="(2040,800)" name="Tunnel">
+    <comp lib="0" loc="(2050,760)" name="Tunnel">
       <a name="label" val="BeEq"/>
+    </comp>
+    <comp lib="0" loc="(2050,800)" name="Tunnel">
+      <a name="label" val="BrLt"/>
     </comp>
     <comp lib="0" loc="(2080,580)" name="Tunnel">
       <a name="label" val="ALU_Output"/>
@@ -1250,8 +1250,11 @@ end TCL_Generic;
     <wire from="(200,70)" to="(590,70)"/>
     <wire from="(2020,680)" to="(2020,710)"/>
     <wire from="(2030,770)" to="(2040,770)"/>
-    <wire from="(2030,790)" to="(2030,800)"/>
-    <wire from="(2030,800)" to="(2040,800)"/>
+    <wire from="(2030,790)" to="(2040,790)"/>
+    <wire from="(2040,760)" to="(2040,770)"/>
+    <wire from="(2040,760)" to="(2050,760)"/>
+    <wire from="(2040,790)" to="(2040,800)"/>
+    <wire from="(2040,800)" to="(2050,800)"/>
     <wire from="(2060,580)" to="(2080,580)"/>
     <wire from="(2080,990)" to="(2100,990)"/>
     <wire from="(210,550)" to="(240,550)"/>
